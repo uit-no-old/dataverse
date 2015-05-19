@@ -62,12 +62,28 @@ Please see also the :doc:`/developers/tools` page, which lists additional tools 
 Setting up your dev environment
 -------------------------------
 
+Dataverse Repository
+~~~~~~~~~~~~~~~~~~~~
+
+Using NetBeans:
+
+Go to Team >> Clone and add the repository info.
+
+Alternative method using Terminal:
+
+- ``git clone https://github.com/IQSS/dataverse.git``
+
+- ``cd dataverse``
+
+- ``mvn package`` 
+
+
 Installing and Running Solr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A Dataverse-specific ``schema.xml`` configuration file (described below) is required.
 
-Download solr-4.6.0.tgz from http://archive.apache.org/dist/lucene/solr/4.6.0/solr-4.6.0.tgz to any directory you like but in the example below, we have downloaded the tarball to a directory called "solr" in our home directory. For now we are using the "example" template but we are replacing ``schema.xml`` with our own.
+Download solr-4.6.0.tgz from http://archive.apache.org/dist/lucene/solr/4.6.0/solr-4.6.0.tgz to any directory you like but in the example below, we have downloaded the tarball to a directory called "solr" in our home directory. For now we are using the "example" template but we are replacing ``schema.xml`` with our own. We will also assume that the clone on the Dataverse repository was retrieved using NetBeans and that it is saved in the path ~/NetBeansProjects.
 
 - ``cd ~/solr``
 - ``tar xvfz solr-4.6.0.tgz``
@@ -75,7 +91,7 @@ Download solr-4.6.0.tgz from http://archive.apache.org/dist/lucene/solr/4.6.0/so
 - ``cp ~/NetBeansProjects/dataverse/conf/solr/4.6.0/schema.xml solr/collection1/conf/schema.xml``
 - ``java -jar start.jar``
 
-Please note: If you prefer, once the proper ``schema.xml`` file is in place, you can simply double-click "start.jar" rather that running ``java -jar start.jar`` from the command line. Figuring out how to stop Solr after double-clicking it is an exercise for the reader.
+Please note: If you prefer, once the proper ``schema.xml`` file is in place, you can simply double-click "start.jar" rather that running ``java -jar start.jar`` from the command line. Figuring out how to stop Solr after double-clicking is an exercise for the reader.
 
 Once Solr is up and running you should be able to see a "Solr Admin" dashboard at http://localhost:8983/solr
 
@@ -86,7 +102,7 @@ Run installer
 
 Once you install Glassfish 4 and PostgreSQL, you need to configure the environment for the Dataverse app - configure the database connection, set some options, etc. We have a new installer script that should do it all for you:
 
-``cd scripts/installer``
+``cd ~/dataverse/scripts/installer``
 
 ``./install``
 
