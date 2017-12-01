@@ -135,7 +135,7 @@ public class OAuth2FirstLoginPage implements java.io.Serializable {
                         extraEmails.add("extra2@example.com");
                         break;
                     case RANDOM_EMAIL4:
-                        authProviderId = "github";
+                        authProviderId = "dataporten";
                         break;                        
                     default:
                         break;
