@@ -61,7 +61,7 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             
             // Extract ad username using regexp
             Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@.*$");
-            Matcher m = p.matcher(userid_secArray.getString(0));
+            Matcher m = p.matcher(userid_secArray.getJsonString(0).toString());
             if(m.matches()) {
                 username = m.group(1);
             }
