@@ -1,7 +1,7 @@
 package edu.harvard.iq.dataverse.authorization.providers.oauth2.impl;
 
 // Dataporten is a part of ScribeJava in the future https://github.com/scribejava/scribejava/pull/805
-// import com.github.scribejava.apis.DataportenApi; //Uncomment and delete DataportenApi.java when ScribeJava is updated in Maven
+import com.github.scribejava.apis.DataportenApi; //Uncomment and delete DataportenApi.java when ScribeJava is updated in Maven
 import com.github.scribejava.core.builder.api.BaseApi;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.harvard.iq.dataverse.authorization.AuthenticatedUserDisplayInfo;
