@@ -152,6 +152,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>com.github.scribejava</groupId>
+            <artifactId>scribejava-core</artifactId>
+            <version>3.1.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
@@ -413,7 +419,7 @@
         <dependency>
             <groupId>com.github.scribejava</groupId>
             <artifactId>scribejava-apis</artifactId>
-            <version>3.1.0</version>
+            <version>5.2.0-java7again</version>
         </dependency>
 	<!-- EXPERIMENTAL: -->
 	<!-- lyncode xoai OAI-PMH implementation: -->
