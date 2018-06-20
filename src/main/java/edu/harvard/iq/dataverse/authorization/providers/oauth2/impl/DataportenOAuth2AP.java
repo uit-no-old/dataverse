@@ -1,7 +1,6 @@
 package edu.harvard.iq.dataverse.authorization.providers.oauth2.impl;
 
-// Dataporten is a part of ScribeJava in the future https://github.com/scribejava/scribejava/pull/805
-import com.github.scribejava.apis.DataportenApi; //Uncomment and delete DataportenApi.java when ScribeJava is updated in Maven
+import com.github.scribejava.apis.DataportenApi;
 import com.github.scribejava.core.builder.api.BaseApi;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.harvard.iq.dataverse.authorization.AuthenticatedUserDisplayInfo;
@@ -40,13 +39,6 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
     protected ParsedUserResponse parseUserResponse( String responseBody ) {
         
         try ( StringReader rdr = new StringReader(responseBody);
-            JsonReader jrdr = Json.createReader(rdr) )  {
-            JsonObject responseObject = jrdr.readObject();
-            JsonObject userObject = responseObject.getJsonObject("user");
-            JsonArray userid_secArray = userObject.getJsonArray("userid_sec");
-            
-            String username = "";
-            
             /*
             Example reponse
             {
@@ -60,12 +52,21 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
                 "audience": "e8160a77-58f8-4006-8ee5-ab64d17a5b1e"
             }
             */
+            JsonReader jrdr = Json.createReader(rdr) )  {
+            JsonObject responseObject = jrdr.readObject();
+            JsonObject userObject = responseObject.getJsonObject("user");
+            JsonArray userid_secArray = userObject.getJsonArray("userid_sec");
             
+            String username = "";
+            String affiliation = "";
+            String position = "";
+                        
             // Extract ad username using regexp
-            Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@.*$");
+            Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
             Matcher m = p.matcher(userid_secArray.getString(0));
             if(m.matches()) {
                 username = m.group(1);
+                affiliation = m.group(2);
             }
             
             ShibUserNameFields shibUserNameFields = ShibUtil.findBestFirstAndLastName(null, null, userObject.getString("name",""));
@@ -73,8 +74,8 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
                     shibUserNameFields.getFirstName(),
                     shibUserNameFields.getLastName(),
                     userObject.getString("email",""),
-                    "", //company
-                    ""
+                    affiliation,
+                    position
             );
             
             return new ParsedUserResponse(
