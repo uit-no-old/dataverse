@@ -864,7 +864,7 @@ public class AuthenticationServiceBean {
      */
     public List<String> getAuthenticationProviderIdsSorted() {
         GitHubOAuth2AP github = new GitHubOAuth2AP(null, null);
-        DataportenOAuth2AP dataporten = new DataportenOAuth2AP(null, null);
+        DataportenOAuth2AP dataporten = new DataportenOAuth2AP(null, null, null);
         GoogleOAuth2AP google = new GoogleOAuth2AP(null, null);
         return Arrays.asList(
                 BuiltinAuthenticationProvider.PROVIDER_ID,
