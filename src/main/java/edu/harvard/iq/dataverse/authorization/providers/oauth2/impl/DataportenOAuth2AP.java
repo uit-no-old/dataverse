@@ -22,12 +22,12 @@ import javax.json.JsonArray;
  */
 public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
     
-    public DataportenOAuth2AP(String aClientId, String aClientSecret) {
+    public DataportenOAuth2AP(String aClientId, String aClientSecret, String userEndpoint) {
         id = "dataporten";
         title = BundleUtil.getStringFromBundle("auth.providers.title.dataporten");
         clientId = aClientId;
         clientSecret = aClientSecret;
-        baseUserEndpoint = "https://auth.dataporten.no/userinfo";
+        baseUserEndpoint = userEndpoint;
     }
     
     @Override

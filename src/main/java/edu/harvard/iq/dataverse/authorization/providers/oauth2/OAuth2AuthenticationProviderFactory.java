@@ -30,7 +30,7 @@ public class OAuth2AuthenticationProviderFactory implements AuthenticationProvid
 
     public OAuth2AuthenticationProviderFactory() {
         builders.put("github", (row, data) -> readRow(row, new GitHubOAuth2AP(data.get("clientId"), data.get("clientSecret"))));
-        builders.put("dataporten", (row, data) -> readRow(row, new DataportenOAuth2AP(data.get("clientId"), data.get("clientSecret"))));
+        builders.put("dataporten", (row, data) -> readRow(row, new DataportenOAuth2AP(data.get("clientId"), data.get("clientSecret"), data.get("userEndpoint"))));
         builders.put("google", (row, data) -> readRow(row, new GoogleOAuth2AP(data.get("clientId"), data.get("clientSecret"))));
         builders.put("orcid", (row, data)  -> readRow(row, new OrcidOAuth2AP(data.get("clientId"), data.get("clientSecret"), data.get("userEndpoint"))));
     }
