@@ -41,7 +41,7 @@
                                     </span>
                                 </label>
                                 <div class="col-sm-4">
-                                    <p:inputText disabled id="username" styleClass="form-control" value="#{OAuth2FirstLoginPage.username}" validator="#{OAuth2FirstLoginPage.validateUserName}"/>
+                                    <p:inputText disabled="disabled" id="username" styleClass="form-control" value="#{OAuth2FirstLoginPage.username}" validator="#{OAuth2FirstLoginPage.validateUserName}"/>
                                     <p:message for="username" display="text"/>
                                 </div>
                                 <div class="col-sm-offset-3 col-sm-9" jsf:rendered="#{OAuth2FirstLoginPage.convertFromBuiltinIsPossible}">
@@ -79,7 +79,7 @@
                                     </span>
                                 </label>
                                 <div class="col-sm-4" jsf:rendered="#{OAuth2FirstLoginPage.getEmailsToPickFrom().size() lt 2}">
-                                    <p:inputText disabled id="selectedEmailZeroOrOneToPickFrom" styleClass="form-control" value="#{OAuth2FirstLoginPage.selectedEmail}" validator="#{OAuth2FirstLoginPage.validateUserEmail}"/>
+                                    <p:inputText disabled="disabled" id="selectedEmailZeroOrOneToPickFrom" styleClass="form-control" value="#{OAuth2FirstLoginPage.selectedEmail}" validator="#{OAuth2FirstLoginPage.validateUserEmail}"/>
                                     <p:message for="selectedEmailZeroOrOneToPickFrom" display="text"/>
                                 </div>
                                 <div class="col-sm-4" jsf:rendered="#{OAuth2FirstLoginPage.getEmailsToPickFrom().size() gt 1}">
@@ -115,7 +115,7 @@
                                     </span>
                                 </label>
                                 <div class="col-sm-4">
-                                    <p:inputText disabled id="affiliation" styleClass="form-control" value="#{OAuth2FirstLoginPage.newUser.displayInfo.affiliation}"/>
+                                    <p:inputText disabled="disabled" id="affiliation" styleClass="form-control" value="#{OAuth2FirstLoginPage.newUser.displayInfo.affiliation}"/>
                                 </div>
                             </div>
                             <div class="form-group">
