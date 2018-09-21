@@ -143,8 +143,8 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
             JsonObject responseObject = jrdr.readObject();
             JsonObject userObject = responseObject.getJsonObject("user");
             JsonArray userid_secArray = userObject.getJsonArray("userid_sec");
-            
-            String username = "";
+             
+            String username = userid_secArray.getString(0).replace("feide:", "");
             String affiliation = "";
             String position = "";
                         
@@ -152,10 +152,7 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
             Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
             Matcher m = p.matcher(userid_secArray.getString(0));
             if(m.matches()) {
-                username = m.group(1);
-                if (affiliation.length() == 0) {
-                    affiliation = m.group(2);
-                }
+                affiliation = m.group(2);
             }
             
             ShibUserNameFields shibUserNameFields = ShibUtil.findBestFirstAndLastName(null, null, userObject.getString("name",""));
@@ -197,18 +194,15 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
             JsonObject userObject = responseObject.getJsonObject("user");
             JsonArray userid_secArray = userObject.getJsonArray("userid_sec");
             
-            String username = "";
+            String username = userid_secArray.getString(0).replace("feide:", "");
             String affiliation = getUserAffiliation(service, accessToken);
             String position = "";
                         
             // Extract ad username using regexp
             Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
             Matcher m = p.matcher(userid_secArray.getString(0));
-            if(m.matches()) {
-                username = m.group(1);
-                if (affiliation.length() == 0) {
-                    affiliation = m.group(2);
-                }
+            if(m.matches() && affiliation.length() == 0) {
+                affiliation = m.group(2);
             }
             
             ShibUserNameFields shibUserNameFields = ShibUtil.findBestFirstAndLastName(null, null, userObject.getString("name",""));
