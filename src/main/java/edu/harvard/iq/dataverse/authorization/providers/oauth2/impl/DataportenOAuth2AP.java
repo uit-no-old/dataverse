@@ -88,7 +88,7 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
     ]
     */
     protected String getUserAffiliation(OAuth2AccessToken accessToken) throws IOException, OAuth2Exception {        
-        final OAuthRequest request = new OAuthRequest(Verb.GET, 'https://groups-api.dataporten.no/groups/me/groups');
+        final OAuthRequest request = new OAuthRequest(Verb.GET, "https://groups-api.dataporten.no/groups/me/groups");
         request.addHeader("Authorization", "Bearer " + accessToken.getAccessToken());
         request.setCharset("UTF-8");
         
