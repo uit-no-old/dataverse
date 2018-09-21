@@ -8,6 +8,8 @@ import edu.harvard.iq.dataverse.authorization.providers.oauth2.AbstractOAuth2Aut
 import edu.harvard.iq.dataverse.authorization.providers.shib.ShibUserNameFields;
 import edu.harvard.iq.dataverse.authorization.providers.shib.ShibUtil;
 import edu.harvard.iq.dataverse.util.BundleUtil;
+
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,12 +17,22 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonArray;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.model.OAuthRequest;
+import com.github.scribejava.core.model.Response;
+import com.github.scribejava.core.model.Verb;
+import com.github.scribejava.core.oauth.OAuth20Service;
 
 /**
  *
  * @author ran033@uit.no (Ruben Andreassen)
  */
 public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
+    
+    final static Logger logger = Logger.getLogger(DataportenOAuth2AP.class.getName());
     
     public DataportenOAuth2AP(String aClientId, String aClientSecret, String userEndpoint) {
         id = "dataporten";
@@ -87,20 +99,25 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
         }
     ]
     */
-    protected String getUserAffiliation(OAuth2AccessToken accessToken) throws IOException, OAuth2Exception {        
-        final OAuthRequest request = new OAuthRequest(Verb.GET, "https://groups-api.dataporten.no/groups/me/groups");
+    protected String getUserAffiliation(OAuth20Service service, OAuth2AccessToken accessToken) {        
+        final OAuthRequest request = new OAuthRequest(Verb.GET, "https://groups-api.dataporten.no/groups/me/groups", service);
         request.addHeader("Authorization", "Bearer " + accessToken.getAccessToken());
         request.setCharset("UTF-8");
         
         final Response response = request.send();
         int responseCode = response.getCode();
-        final String body = response.getBody();        
-        logger.log(Level.FINE, "In getUserAffiliation. Body: {0}", body);
+        final String body;
+        try {
+            body = response.getBody();   
+        } catch(IOException e) {
+            return "";
+        }
+        logger.log(Level.FINE, "In getUserRecord. Body: {0}", body);  
 
         if ( responseCode == 200 ) {
-            try ( StringReader rdr = new StringReader(responseBody);
+            try ( StringReader rdr = new StringReader(body);
                 JsonReader jrdr = Json.createReader(rdr) )  {
-                JsonArray groups = jrdr.getJsonArray();
+                JsonArray groups = jrdr.readArray();
 
                 for (int i = 0; i < groups.size(); i++) {
                     JsonObject group = groups.getJsonObject(i);
@@ -111,13 +128,12 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
                     return group.getString("eduOrgLegalName", "");
                 }
             }
-        } else {
-            throw new OAuth2Exception(responseCode, body, "Error getting the user groups.");
         }
+        return "";
     }
     
     @Override
-    protected ParsedUserResponse parseUserResponse( String responseBody, OAuth2AccessToken accessToken ) {
+    protected ParsedUserResponse parseUserResponse( String responseBody, OAuth20Service service, OAuth2AccessToken accessToken ) {
         /*
         Example reponse
         {
@@ -138,7 +154,62 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
             JsonArray userid_secArray = userObject.getJsonArray("userid_sec");
             
             String username = "";
-            String affiliation = getUserAffiliation(accessToken);
+            String affiliation = getUserAffiliation(service, accessToken);
+            String position = "";
+                        
+            // Extract ad username using regexp
+            Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
+            Matcher m = p.matcher(userid_secArray.getString(0));
+            if(m.matches()) {
+                username = m.group(1);
+                if (affiliation.length() == 0) {
+                    affiliation = m.group(2);
+                }
+            }
+            
+            ShibUserNameFields shibUserNameFields = ShibUtil.findBestFirstAndLastName(null, null, userObject.getString("name",""));
+            AuthenticatedUserDisplayInfo displayInfo = new AuthenticatedUserDisplayInfo(
+                    shibUserNameFields.getFirstName(),
+                    shibUserNameFields.getLastName(),
+                    userObject.getString("email",""),
+                    affiliation,
+                    position
+            );
+            
+            return new ParsedUserResponse(
+                    displayInfo, 
+                    userObject.getString("userid"), //persistentUserId 
+                    username, //username
+                    displayInfo.getEmailAddress().length()>0 ? Collections.singletonList(displayInfo.getEmailAddress())
+                                                             : Collections.emptyList() );
+
+        }
+        
+    }
+    
+    @Override
+    protected ParsedUserResponse parseUserResponse( String responseBody ) {
+        /*
+        Example reponse
+        {
+            "user": {
+                "userid": "76a7a061-3c55-430d-8ee0-6f82ec42501f",
+                "userid_sec": ["feide:andreas@uninett.no"],
+                "name": "Andreas \u00c5kre Solberg",
+                "email": "andreas.solberg@uninett.no",
+                "profilephoto": "p:a3019954-902f-45a3-b4ee-bca7b48ab507"
+            },
+            "audience": "e8160a77-58f8-4006-8ee5-ab64d17a5b1e"
+        }
+        */
+        try ( StringReader rdr = new StringReader(responseBody);
+            JsonReader jrdr = Json.createReader(rdr) )  {
+            JsonObject responseObject = jrdr.readObject();
+            JsonObject userObject = responseObject.getJsonObject("user");
+            JsonArray userid_secArray = userObject.getJsonArray("userid_sec");
+            
+            String username = "";
+            String affiliation = "";
             String position = "";
                         
             // Extract ad username using regexp

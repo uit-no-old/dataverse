@@ -94,6 +94,7 @@ public abstract class AbstractOAuth2AuthenticationProvider implements Authentica
     public abstract BaseApi<OAuth20Service> getApiInstance();
     
     protected abstract ParsedUserResponse parseUserResponse( String responseBody );
+    protected abstract ParsedUserResponse parseUserResponse( String responseBody, OAuth20Service service, OAuth2AccessToken accessToken );
     
     public OAuth20Service getService(String state, String redirectUrl) {
         ServiceBuilder svcBuilder = new ServiceBuilder()
@@ -123,7 +124,7 @@ public abstract class AbstractOAuth2AuthenticationProvider implements Authentica
         logger.log(Level.FINE, "In getUserRecord. Body: {0}", body);
 
         if ( responseCode == 200 ) {
-            final ParsedUserResponse parsed = parseUserResponse(body, accessToken);
+            final ParsedUserResponse parsed = parseUserResponse(body, service, accessToken);
             return new OAuth2UserRecord(getId(), parsed.userIdInProvider,
                                         parsed.username, 
                                         OAuth2TokenData.from(accessToken),

@@ -13,6 +13,9 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.oauth.OAuth20Service;
+
 /**
  * IDP adaptor for GitHub.com
  * @author michael
@@ -32,6 +35,11 @@ public class GitHubOAuth2AP extends AbstractOAuth2AuthenticationProvider {
         return GitHubApi.instance();
     }
     
+    @Override
+    protected ParsedUserResponse parseUserResponse( String responseBody, OAuth20Service service, OAuth2AccessToken accessToken ) {
+        return parseUserResponse(responseBody);
+    }
+
     @Override
     protected ParsedUserResponse parseUserResponse( String responseBody ) {
         
