@@ -42,9 +42,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
-import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.oauth.OAuth20Service;
-
 /**
  * OAuth2 identity provider for ORCiD. Note that ORCiD has two systems: sandbox
  * and production. Hence having the user endpoint as a parameter.
@@ -119,11 +116,6 @@ public class OrcidOAuth2AP extends AbstractOAuth2AuthenticationProvider {
         }
     }
     
-    @Override
-    protected ParsedUserResponse parseUserResponse( String responseBody, OAuth20Service service, OAuth2AccessToken accessToken ) {
-        return parseUserResponse(responseBody);
-    }
-
     @Override
     protected ParsedUserResponse parseUserResponse(String responseBody) {
         DocumentBuilderFactory dbFact = DocumentBuilderFactory.newInstance();

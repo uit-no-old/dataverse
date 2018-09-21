@@ -11,9 +11,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.oauth.OAuth20Service;
-
 /**
  *
  * @author michael
@@ -32,11 +29,6 @@ public class GoogleOAuth2AP extends AbstractOAuth2AuthenticationProvider {
     @Override
     public BaseApi getApiInstance() {
         return GoogleApi20.instance();
-    }
-
-    @Override
-    protected ParsedUserResponse parseUserResponse( String responseBody, OAuth20Service service, OAuth2AccessToken accessToken ) {
-        return parseUserResponse(responseBody);
     }
 
     @Override
