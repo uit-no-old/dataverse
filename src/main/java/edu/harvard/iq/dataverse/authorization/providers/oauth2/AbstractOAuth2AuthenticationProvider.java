@@ -123,7 +123,7 @@ public abstract class AbstractOAuth2AuthenticationProvider implements Authentica
         logger.log(Level.FINE, "In getUserRecord. Body: {0}", body);
 
         if ( responseCode == 200 ) {
-            final ParsedUserResponse parsed = parseUserResponse(body);
+            final ParsedUserResponse parsed = parseUserResponse(body, accessToken);
             return new OAuth2UserRecord(getId(), parsed.userIdInProvider,
                                         parsed.username, 
                                         OAuth2TokenData.from(accessToken),
