@@ -125,7 +125,7 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
                 for (int i = 0; i < groups.size(); i++) {
                     JsonObject group = groups.getJsonObject(i);
                     // Skip all other group types
-                    if (group.getString("type", "") != "fc:org") {
+                    if (group.getString("type", "").toString() != "fc:org") {
                         continue;
                     }
                     return group.getString("eduOrgLegalName", "");
