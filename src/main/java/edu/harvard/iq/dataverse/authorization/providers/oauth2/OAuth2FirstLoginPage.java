@@ -136,6 +136,7 @@ public class OAuth2FirstLoginPage implements java.io.Serializable {
                         break;
                     case RANDOM_EMAIL4:
                         authProviderId = "dataporten";
+                        username = randomUser.get("username");
                         break;                        
                     default:
                         break;
