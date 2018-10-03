@@ -66,7 +66,6 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
     protected String getUserAffiliation(OAuth20Service service, OAuth2AccessToken accessToken) {        
         final OAuthRequest request = new OAuthRequest(Verb.GET, "https://groups-api.dataporten.no/groups/me/groups", service);
         request.addHeader("Authorization", "Bearer " + accessToken.getAccessToken());
-        request.addHeader("Accept-Language", "en-US");
         request.setCharset("UTF-8");
         
         final Response response = request.send();
@@ -91,13 +90,12 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
                     if (!type.equals("fc:org")) {
                         continue;
                     }
-                    return group.getString("eduOrgLegalName", "");
-                    /*
+                    
                     String affiliation = getUserAffiliationEN(service, group.getString("id", ""));
                     if (affiliation.length() == 0) {
                         return group.getString("eduOrgLegalName", "");
                     }
-                    return affiliation;*/
+                    return affiliation;
                 }
             }
         }
@@ -112,7 +110,6 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
         "name": "UiT The Arctic University of Norway"
     }
     */
-    /*
     protected String getUserAffiliationEN(OAuth20Service service, String id) {
         final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.dataporten.no/orgs/"+id, service);
         request.addHeader("Accept-Language", "en-US");
@@ -137,10 +134,13 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             }
         }
         return "";
-    }*/
+    }
 
     @Override
     protected ParsedUserResponse parseUserResponse( String responseBody ) {
+        /*
+        ATTENTION! This function is not used
+        */
         try ( StringReader rdr = new StringReader(responseBody);
             JsonReader jrdr = Json.createReader(rdr) )  {
             JsonObject responseObject = jrdr.readObject();
@@ -200,6 +200,10 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             String username = userid_secArray.getString(0).replace("feide:", "");
             String affiliation = getUserAffiliation(service, accessToken);
             String position = "";
+            String email = userObject.getString("email","");
+            String displayName = userObject.getString("name","");
+            String firstName = displayName;
+            String lastName = "";
                         
             // Extract ad username using regexp
             Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
@@ -207,12 +211,18 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             if(m.matches() && affiliation.length() == 0) {
                 affiliation = m.group(2);
             }
+
+            // Extract first and last name
+            String[] parts = displayName.split(" ");
+            if (parts.length > 1) {
+                firstName = parts[0];
+                lastName = parts[parts.length-1];
+            }
             
-            ShibUserNameFields shibUserNameFields = ShibUtil.findBestFirstAndLastName(null, null, userObject.getString("name",""));
             AuthenticatedUserDisplayInfo displayInfo = new AuthenticatedUserDisplayInfo(
-                    shibUserNameFields.getFirstName(),
-                    shibUserNameFields.getLastName(),
-                    userObject.getString("email",""),
+                    firstName,
+                    lastName,
+                    email,
                     affiliation,
                     position
             );
