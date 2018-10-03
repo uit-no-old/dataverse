@@ -55,56 +55,18 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
 
     [
         {
-            "displayName": "dataverse-ns9999k",
-            "membership": {
-                "basic": "member"
-            },
-            "id": "fc:adhoc:b7d0fd8d-6e63-4314-b356-7832a7eac3b3",
-            "type": "voot:ad-hoc",
-            "description": "management of dataverse-ns9999k on the SP."
-        },
-        {
-            "membership": {
-                "affiliation": [
-                    "employee",
-                    "staff",
-                    "member"
-                ],
-                "primaryAffiliation": "staff",
-                "displayName": "Stab",
-                "title": [
-                    "Senioringeni\u00f8r"
-                ],
-                "basic": "admin"
-            },
-            "orgType": [
-                "higher_education"
-            ],
-            "norEduOrgUniqueIdentifier": "00000186",
-            "public": true,
-            "mail": "postmottak@uit.no",
-            "displayName": "UiT Norges Arktiske Universitet",
+            ...
             "id": "fc:org:uit.no",
-THIS-->     "type": "fc:org",
-THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
-            "norEduOrgNIN": "NO970422528"
-        },
-        {
-            "membership": {
-                "basic": "member",
-                "primaryOrgUnit": true
-            },
-            "public": true,
-            "displayName": "SUA",
-            "id": "fc:org:uit.no:unit:262624",
-            "type": "fc:orgunit",
-            "parent": "fc:org:uit.no"
+            "type": "fc:org",
+            "eduOrgLegalName": "UiT Norges Arktiske Universitet",
+            ...
         }
     ]
     */
     protected String getUserAffiliation(OAuth20Service service, OAuth2AccessToken accessToken) {        
         final OAuthRequest request = new OAuthRequest(Verb.GET, "https://groups-api.dataporten.no/groups/me/groups", service);
         request.addHeader("Authorization", "Bearer " + accessToken.getAccessToken());
+        request.addHeader("Accept-Language", "en-US");
         request.setCharset("UTF-8");
         
         final Response response = request.send();
@@ -115,7 +77,7 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
         } catch(IOException e) {
             return "";
         }
-        logger.log(Level.FINE, "In getUserRecord. Body: {0}", body);  
+        logger.log(Level.FINE, "In getUserAffiliation. Body: {0}", body);  
 
         if ( responseCode == 200 ) {
             try ( StringReader rdr = new StringReader(body);
@@ -130,11 +92,52 @@ THIS-->     "eduOrgLegalName": "UiT Norges Arktiske Universitet",
                         continue;
                     }
                     return group.getString("eduOrgLegalName", "");
+                    /*
+                    String affiliation = getUserAffiliationEN(service, group.getString("id", ""));
+                    if (affiliation.length() == 0) {
+                        return group.getString("eduOrgLegalName", "");
+                    }
+                    return affiliation;*/
                 }
             }
         }
         return "";
     }
+
+    /*
+    GET https://api.dataporten.no/orgs/fc:org:uit.no
+
+    {
+        ...
+        "name": "UiT The Arctic University of Norway"
+    }
+    */
+    /*
+    protected String getUserAffiliationEN(OAuth20Service service, String id) {
+        final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.dataporten.no/orgs/"+id, service);
+        request.addHeader("Accept-Language", "en-US");
+        request.setCharset("UTF-8");
+        
+        final Response response = request.send();
+        int responseCode = response.getCode();
+        final String body;
+        try {
+            body = response.getBody();   
+        } catch(IOException e) {
+            return "";
+        }
+        logger.log(Level.FINE, "In getUserAffiliationEN. Body: {0}", body);  
+
+        if ( responseCode == 200 ) {
+            try ( StringReader rdr = new StringReader(body);
+                JsonReader jrdr = Json.createReader(rdr) )  {
+                JsonObject jobj = jrdr.readObject();
+
+                return jobj.getString("name", "");
+            }
+        }
+        return "";
+    }*/
 
     @Override
     protected ParsedUserResponse parseUserResponse( String responseBody ) {
