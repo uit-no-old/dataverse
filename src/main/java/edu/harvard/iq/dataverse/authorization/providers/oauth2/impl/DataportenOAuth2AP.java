@@ -263,6 +263,9 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             String affiliation = getUserAffiliation(service, accessToken);
             String position = "";
             String email = userObject.getString("email","");
+            String displayName = userObject.getString("name","");
+            String firstName = displayName;
+            String lastName = "";
                         
             // Extract ad username using regexp
             Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
@@ -272,12 +275,24 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             }
             
             ShibUserNameFields shibUserNameFields = getUserNameFields(service, accessToken);
+            if (shibUserNameFields != null) {
+                firstName = shibUserNameFields.getFirstName();
+                lastName = shibUserNameFields.getLastName();
+            } else {
+                // Extract first and last name from display name
+                String[] parts = displayName.split(" ");
+                if (parts.length > 1) {
+                    firstName = parts[0];
+                    lastName = parts[parts.length-1];
+                }
+            }
+
             AuthenticatedUserDisplayInfo displayInfo = new AuthenticatedUserDisplayInfo(
-                    shibUserNameFields.getFirstName(),
-                    shibUserNameFields.getLastName(),
-                    email,
-                    affiliation,
-                    position
+                firstName,
+                lastName,
+                email,
+                affiliation,
+                position
             );
             
             return new ParsedUserResponse(
