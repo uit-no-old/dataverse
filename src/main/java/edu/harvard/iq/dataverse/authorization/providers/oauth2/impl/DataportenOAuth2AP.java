@@ -178,6 +178,62 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
         }
     }
 
+    /* GET https://api.dataporten.no/userinfo/v1/userinfo
+
+    {
+        "displayName": "Per Spellmann",
+        "givenName": [
+            "Per"
+        ],
+        "sn": [
+            "Spellmann"
+        ]
+    }
+    */
+    protected ShibUserNameFields getUserNameFields(OAuth20Service service, OAuth2AccessToken accessToken) {        
+        final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.dataporten.no/userinfo/v1/userinfo", service);
+        request.addHeader("Authorization", "Bearer " + accessToken.getAccessToken());
+        request.setCharset("UTF-8");
+        
+        final Response response = request.send();
+        int responseCode = response.getCode();
+        final String body;
+        try {
+            body = response.getBody();   
+        } catch(IOException e) {
+            return null;
+        }
+        logger.log(Level.FINE, "In getUserAffiliation. Body: {0}", body);  
+
+        if ( responseCode == 200 ) {
+            try ( StringReader rdr = new StringReader(body);
+                JsonReader jrdr = Json.createReader(rdr) )  {
+                JsonObject jobj = jrdr.readObject();
+
+                JsonArray givenName = jobj.getJsonArray("givenName");
+                JsonArray sn = jobj.getJsonArray("sn");
+
+                String firstName = "";
+                String lastName = "";
+
+                for (int i = 0; i < givenName.size(); i++) {
+                    firstName += givenName.getString(i);
+                    firstName += " ";
+                }
+
+                for (int i = 0; i < sn.size(); i++) {
+                    lastName += sn.getString(i);
+                    lastName += " ";
+                }
+
+                ShibUserNameFields shibUserNameFields = ShibUtil.findBestFirstAndLastName(firstName.trim(), lastName.trim(), null);
+
+                return shibUserNameFields;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean isUserInfoUpdateAllowed() {
         return false;
@@ -207,9 +263,6 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             String affiliation = getUserAffiliation(service, accessToken);
             String position = "";
             String email = userObject.getString("email","");
-            String displayName = userObject.getString("name","");
-            String firstName = displayName;
-            String lastName = "";
                         
             // Extract ad username using regexp
             Pattern p = Pattern.compile("^feide:([0-9a-zA-Z]+?)@([0-9a-zA-Z]*).*$");
@@ -217,17 +270,11 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
             if(m.matches() && affiliation.length() == 0) {
                 affiliation = m.group(2);
             }
-
-            // Extract first and last name
-            String[] parts = displayName.split(" ");
-            if (parts.length > 1) {
-                firstName = parts[0];
-                lastName = parts[parts.length-1];
-            }
             
+            ShibUserNameFields shibUserNameFields = getUserNameFields(service, accessToken);
             AuthenticatedUserDisplayInfo displayInfo = new AuthenticatedUserDisplayInfo(
-                    firstName,
-                    lastName,
+                    shibUserNameFields.getFirstName(),
+                    shibUserNameFields.getLastName(),
                     email,
                     affiliation,
                     position
