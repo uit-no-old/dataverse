@@ -139,6 +139,7 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
     @Override
     protected ParsedUserResponse parseUserResponse( String responseBody ) {
         /*
+        --- Ignore
         ATTENTION! This function is not used
         */
         try ( StringReader rdr = new StringReader(responseBody);
@@ -175,6 +176,11 @@ public class DataportenOAuth2AP extends AbstractOAuth2AuthenticationProvider {
                                                              : Collections.emptyList() );
 
         }
+    }
+
+    @Override
+    public boolean isUserInfoUpdateAllowed() {
+        return false;
     }
     
     protected ParsedUserResponse parseUserResponse( String responseBody, OAuth20Service service, OAuth2AccessToken accessToken ) {
