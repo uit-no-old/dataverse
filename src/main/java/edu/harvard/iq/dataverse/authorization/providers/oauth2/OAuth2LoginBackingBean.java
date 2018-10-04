@@ -97,11 +97,11 @@ public class OAuth2LoginBackingBean implements Serializable {
             if (dvUser == null) {
                 // need to create the user
                 newAccountPage.setNewUser(oauthUser);
-                /*if (idp.getId().equals("dataporten")) {
+                if (idp.getId().equals("dataporten")) {
                     FacesContext.getCurrentInstance().getExternalContext().redirect("/oauth2/firstLoginDataporten.xhtml");
-                } else {*/
-                FacesContext.getCurrentInstance().getExternalContext().redirect("/oauth2/firstLogin.xhtml");
-                //}
+                } else {
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("/oauth2/firstLogin.xhtml");
+                }
 
             } else {
                 // login the user and redirect to HOME of intended page (if any).
